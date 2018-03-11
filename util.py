@@ -15,3 +15,6 @@ def set_object_active(objectName):
         raise Exception("Input argv is error")
     else:
         obj.select_set(action='SELECT')
+        # active应该一直都只有一个
+        return C.active_object
+

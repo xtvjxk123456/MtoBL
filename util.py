@@ -1,5 +1,4 @@
 # coding:utf-8
-# 这个模块是在blender 2.8 py3里用的
 import bpy
 
 C = bpy.context
@@ -20,6 +19,7 @@ def set_object_active(objectName):
         return C.active_object
 
 
+# select object
 def select_object(objectName, append=False):
     if not append:
         O.object.select_all(action='DESELECT')
@@ -30,4 +30,3 @@ def select_object(objectName, append=False):
     else:
         obj.select_set(action='SELECT')
         return C.selected_objects
-

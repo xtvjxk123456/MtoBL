@@ -71,3 +71,22 @@ def vertexs_position(meshObjectName, is_global=True):
     else:
         for v in verts:
             yield v.co.to_tuple()
+
+
+# 暂时没有更新法线
+def update_mesh(meshObjectName, data):
+    obj = bpy.data.objects[meshObjectName]
+
+    mesh_bm = bm.new()
+    faces_data = data['f']
+    verts_data = data['v']
+
+    # create verts
+    verts = [mesh_bm.verts.new(tuple(v[:3])) for v in verts_data]
+    mesh_bm.verts.ensure_lookup_table()
+
+    # create faces
+    faces = [mesh_bm.faces.new(tuple(map(lambda x: verts[x], f))) for f in faces_data]
+    mesh_bm.faces.ensure_lookup_table()
+
+    mesh_bm.to_mesh(obj.data)

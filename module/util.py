@@ -74,8 +74,15 @@ def vertexs_position(meshObjectName, is_global=True):
 
 
 # 暂时没有更新法线
-def update_mesh(meshObjectName, data):
-    obj = bpy.data.objects[meshObjectName]
+def update_mesh(meshShapeName, data):
+    """
+
+    :param meshShapeName:
+    :param data: {'f':[],'v':[]}
+    :return:
+    """
+    # 使用mesh shape name
+    mesh = bpy.data.meshes[meshShapeName]
 
     mesh_bm = bm.new()
     faces_data = data['f']
@@ -83,10 +90,12 @@ def update_mesh(meshObjectName, data):
 
     # create verts
     verts = [mesh_bm.verts.new(tuple(v[:3])) for v in verts_data]
-    mesh_bm.verts.ensure_lookup_table()
+    if not is_future_version():
+        mesh_bm.verts.ensure_lookup_table()
 
     # create faces
     faces = [mesh_bm.faces.new(tuple(map(lambda x: verts[x], f))) for f in faces_data]
-    mesh_bm.faces.ensure_lookup_table()
+    if not is_future_version():
+        mesh_bm.faces.ensure_lookup_table()
 
-    mesh_bm.to_mesh(obj.data)
+    mesh_bm.to_mesh(mesh)

@@ -74,28 +74,45 @@ def vertexs_position(meshObjectName, is_global=True):
 
 
 # 暂时没有更新法线
-def update_mesh(meshShapeName, data):
+def update_mesh(meshShapeName, data=None):
     """
 
     :param meshShapeName:
     :param data: {'f':[],'v':[]}
     :return:
     """
-    # 使用mesh shape name
-    mesh = bpy.data.meshes[meshShapeName]
+    if data:
+        # 使用mesh shape name
+        mesh = bpy.data.meshes[meshShapeName]
 
-    mesh_bm = bm.new()
-    faces_data = data['f']
-    verts_data = data['v']
+        mesh_bm = bm.new()
+        faces_data = data['f']
+        verts_data = data['v']
 
-    # create verts
-    verts = [mesh_bm.verts.new(tuple(v[:3])) for v in verts_data]
-    if not is_future_version():
-        mesh_bm.verts.ensure_lookup_table()
+        # create verts
+        verts = [mesh_bm.verts.new(tuple(v[:3])) for v in verts_data]
+        if not is_future_version():
+            mesh_bm.verts.ensure_lookup_table()
 
-    # create faces
-    faces = [mesh_bm.faces.new(tuple(map(lambda x: verts[x], f))) for f in faces_data]
-    if not is_future_version():
-        mesh_bm.faces.ensure_lookup_table()
+        # create faces
+        faces = [mesh_bm.faces.new(tuple(map(lambda x: verts[x], f))) for f in faces_data]
+        if not is_future_version():
+            mesh_bm.faces.ensure_lookup_table()
 
-    mesh_bm.to_mesh(mesh)
+        mesh_bm.to_mesh(mesh)
+
+
+def create_mesh(transfomrName, data=None):
+    # create mesh
+    if D.objects.find(transfomrName) < 0 and D.meshes.find(transfomrName + 'Shape') < 0:
+        mesh = D.meshes.new(transfomrName + 'Shape')
+        obj = D.objects.new(transfomrName, mesh)
+        if not is_future_version():
+            C.scene.objects.link(obj)
+        else:
+            C.scene_collection.objects.link(obj)
+        update_mesh(mesh, data)
+        return obj
+    else:
+        raise Exception('Input transform name is illegal.')
+

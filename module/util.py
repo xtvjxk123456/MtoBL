@@ -88,16 +88,33 @@ def update_mesh(meshShapeName, data=None):
         mesh_bm = bm.new()
         faces_data = data['f']
         verts_data = data['v']
+        # normal_data = data['n']
+        uv_data = data['uv']
+        face_uv_index_data = data['fuv']
 
         # create verts
         verts = [mesh_bm.verts.new(tuple(v[:3])) for v in verts_data]
         if not is_future_version():
             mesh_bm.verts.ensure_lookup_table()
 
+        # normal can not set current
+        # todo
         # create faces
         faces = [mesh_bm.faces.new(tuple(map(lambda x: verts[x], f))) for f in faces_data]
         if not is_future_version():
             mesh_bm.faces.ensure_lookup_table()
+
+        # face_uv
+        uv_layer = bm.loops.layers.uv.verify()
+        for f, fuv in zip(faces, face_uv_index_data):
+            f.loops.index_update()
+            for i, loop in enumerate(f.loops):
+                try:
+                    uv_index = fuv[i]
+                except IndexError:
+                    pass
+                else:
+                    loop[uv_layer].uv = uv_data[uv_index]
 
         mesh_bm.to_mesh(mesh)
 

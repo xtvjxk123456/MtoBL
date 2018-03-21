@@ -118,6 +118,7 @@ def update_mesh(meshShapeName, data=None):
 
         mesh_bm.to_mesh(mesh)
         # 显性更新好像不容易崩溃
+        bm.clear()
         mesh.update()
 
 

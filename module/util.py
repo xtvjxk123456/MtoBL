@@ -117,6 +117,8 @@ def update_mesh(meshShapeName, data=None):
                     loop[uv_layer].uv = uv_data[uv_index]
 
         mesh_bm.to_mesh(mesh)
+        # 显性更新好像不容易崩溃
+        mesh.update()
 
 
 def create_mesh(transfomrName, data=None):

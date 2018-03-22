@@ -26,19 +26,24 @@ def mesh_data(mesh):
         face_uv_data.append(face_uv_index[current_index:current_index + v])
         current_index = current_index + v
 
-    # vert_position
-    verts_data = [list(maya_bl_world_rotate * v.getPosition('world')) for v in mesh.verts]
+        # vert_position
+        verts_data = [list(maya_bl_world_rotate * v.getPosition('world')) for v in mesh.verts]
+        # vert_normal_value
+        # normal_data = [list(maya_bl_world_rotate*v.getNormal('world')) for v in mesh.verts]
 
-    # vert_normal_value
-    # normal_data = [list(maya_bl_world_rotate*v.getNormal('world')) for v in mesh.verts]
+        # face_normal
+        face_normal_data = [map(lambda x: list(maya_bl_world_rotate * x), f.getNormals('world')) for f in mesh.faces]
 
-    # uv_data
-    uv_data = zip(*mesh.getUVs())
+        # uv_data
+        uv_data = zip(*mesh.getUVs())
 
-    return {'f': face_data, 'v': verts_data,
-            # 'n':normal_data,
-            'uv': uv_data, 'fuv': face_uv_data
-            }
+        return {'f': face_data,
+                'fn': face_normal_data,
+                'v': verts_data,
+                # 'n':normal_data,
+                'uv': uv_data,
+                'fuv': face_uv_data
+                }
 
 
 def run():

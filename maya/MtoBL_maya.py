@@ -37,11 +37,15 @@ def mesh_data(mesh):
         # uv_data
         uv_data = zip(*mesh.getUVs())
 
+        # origin pivot
+        pivot_data = list(maya_bl_world_rotate * pm.PyNode('pCube1').getPivots(worldSpace=True)[0])
+
         return {'f': face_data,
                 'fn': face_normal_data,
                 'v': verts_data,
                 # 'n':normal_data,
                 'uv': uv_data,
+                'origin': pivot_data,
                 'fuv': face_uv_data
                 }
 

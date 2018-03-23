@@ -2,6 +2,7 @@
 import itertools
 import bpy
 import bmesh as bm
+import mathutils as mu
 
 C = bpy.context
 D = bpy.data
@@ -75,67 +76,17 @@ def vertexs_position(meshObjectName, is_global=True):
 
 
 # 暂时没有更新法线
-def update_mesh(meshShapeName, data=None):
+def update_mesh(objName, meshShapeName, data=None):
     """
     数据例子
-    {'f': [[0, 1, 3, 2],
-       [2, 3, 5, 4],
-       [4, 5, 7, 6],
-       [6, 7, 1, 0],
-       [1, 7, 5, 3],
-       [6, 0, 2, 4]],
- 'fn': [[[0.0, -1.0, 6.123233995736766e-17],
-         [0.0, -1.0, 6.123233995736766e-17],
-         [0.0, -1.0, 6.123233995736766e-17],
-         [0.0, -1.0, 6.123233995736766e-17]],
-        [[0.0, 6.123233995736766e-17, 1.0],
-         [0.0, 6.123233995736766e-17, 1.0],
-         [0.0, 6.123233995736766e-17, 1.0],
-         [0.0, 6.123233995736766e-17, 1.0]],
-        [[0.0, 1.0, -6.123233995736766e-17],
-         [0.0, 1.0, -6.123233995736766e-17],
-         [0.0, 1.0, -6.123233995736766e-17],
-         [0.0, 1.0, -6.123233995736766e-17]],
-        [[0.0, -6.123233995736766e-17, -1.0],
-         [0.0, -6.123233995736766e-17, -1.0],
-         [0.0, -6.123233995736766e-17, -1.0],
-         [0.0, -6.123233995736766e-17, -1.0]],
-        [[1.0, 0.0, 0.0], [1.0, 0.0, 0.0], [1.0, 0.0, 0.0], [1.0, 0.0, 0.0]],
-        [[-1.0, 0.0, 0.0],
-         [-1.0, 0.0, 0.0],
-         [-1.0, 0.0, 0.0],
-         [-1.0, 0.0, 0.0]]],
- 'fuv': [[0, 1, 3, 2],
-         [2, 3, 5, 4],
-         [4, 5, 7, 6],
-         [6, 7, 9, 8],
-         [1, 10, 11, 3],
-         [12, 0, 2, 13]],
- 'uv': [(0.375, 0.0),
-        (0.625, 0.0),
-        (0.375, 0.25),
-        (0.625, 0.25),
-        (0.375, 0.5),
-        (0.625, 0.5),
-        (0.375, 0.75),
-        (0.625, 0.75),
-        (0.375, 1.0),
-        (0.625, 1.0),
-        (0.875, 0.0),
-        (0.875, 0.25),
-        (0.125, 0.0),
-        (0.125, 0.25)],
- 'v': [[-0.4219123581960016,
-        -0.8774453469943295,
-        1.7685093998569443e-08,
-        0.0],
-       [0.6200289269373602, -0.8774453469943295, 1.7685093998569443e-08, 0.0],
-       [-0.4219123581960016, -0.8774453469943294, 1.0177453933183336, 0.0],
-       [0.6200289269373602, -0.8774453469943294, 1.0177453933183336, 0.0],
-       [-0.4219123581960016, 0.7162097624111882, 1.0177453933183336, 0.0],
-       [0.6200289269373602, 0.7162097624111882, 1.0177453933183336, 0.0],
-       [-0.4219123581960016, 0.7162097624111881, 1.7685093900986212e-08, 0.0],
-       [0.6200289269373602, 0.7162097624111881, 1.7685093900986212e-08, 0.0]]}
+    {'f':face_data,
+    'fn':face_normal_data,
+    'v':verts_data,
+    # 'n':normal_data,
+    'uv':uv_data,
+    'origin':pivot_data,
+    'fuv':face_uv_data
+    }
 
     :param meshShapeName:
     :param data: {'f':[],'v':[]}
@@ -145,6 +96,11 @@ def update_mesh(meshShapeName, data=None):
         # 使用mesh shape name
         mesh = bpy.data.meshes[meshShapeName]
 
+        # find obj
+        obj = bpy.data.objects[objName]
+        # set origin to 0
+        obj.matrix_world = mu.Matrix()
+
         mesh_bm = bm.new()
         faces_data = data['f']
         verts_data = data['v']
@@ -152,6 +108,7 @@ def update_mesh(meshShapeName, data=None):
         face_normal_data = data['fn']
         uv_data = data['uv']
         face_uv_index_data = data['fuv']
+        pivot_data = data['origin']
 
         # create verts
         verts = [mesh_bm.verts.new(tuple(v[:3])) for v in verts_data]
@@ -191,6 +148,14 @@ def update_mesh(meshShapeName, data=None):
         # can link ui
         mesh.use_auto_smooth = True  # custom normal split需要auto smooth
         mesh.update()
+
+        # 处理origin
+
+        saved_location = bpy.context.scene.cursor_location.copy()
+        bpy.context.scene.objects.active = obj
+        bpy.context.scene.cursor_location = pivot_data
+        bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
+        bpy.context.scene.cursor_location = saved_location
 
 
 def create_mesh(transfomrName, data=None):

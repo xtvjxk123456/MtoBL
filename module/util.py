@@ -167,7 +167,7 @@ def create_mesh(transfomrName, data=None):
             C.scene.objects.link(obj)
         else:
             C.scene_collection.objects.link(obj)
-        update_mesh(mesh, data)
+        update_mesh(obj.name, mesh.name, data)
         return obj
     else:
         raise Exception('Input transform name is illegal.')

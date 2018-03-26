@@ -165,6 +165,7 @@ def create_mesh(transfomrName, data=None):
         obj = D.objects.new(transfomrName, mesh)
         if not is_future_version():
             C.scene.objects.link(obj)
+            C.scene.update()
         else:
             C.scene_collection.objects.link(obj)
         update_mesh(obj.name, mesh.name, data)

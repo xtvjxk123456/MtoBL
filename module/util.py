@@ -173,6 +173,12 @@ def create_mesh(transfomrName, data=None):
     else:
         raise Exception('Input transform name is illegal.')
 
+
 # C.scene_collection为当前collection
 # 现阶段2.8没有D.scene_collection 故无法创建collection
 # 不知如何select/active collection
+
+def force_redraw_view_port():
+    for k, v in bpy.context.screen.areas.items():
+        if v.type == 'VIEW_3D':
+            v.tag_redraw()
